@@ -14,7 +14,7 @@ main :: proc (
 	defer delete( sonar )
 
 	{ // Load input data
-		when #config( example, true ) {
+		when #config( example, false ) {
 			data := example_data
 		} else {
 			data, _ := os.read_entire_file( "day1.txt" ); defer delete(  data  )

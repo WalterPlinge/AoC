@@ -3,10 +3,8 @@ package day_3
 import "core:fmt"
 import "core:os"
 import "core:slice"
-import "core:sort"
 import "core:strconv"
 import "core:strings"
-import "core:time"
 
 main :: proc (
 ) {
@@ -16,7 +14,7 @@ main :: proc (
 	defer delete( diagnostic )
 
 	{ // Load input data
-		when #config( example, true ) {
+		when #config( example, false ) {
 			data := example_data
 		} else {
 			data, _ := os.read_entire_file( "day3.txt" ); defer delete(  data  )
@@ -32,9 +30,9 @@ main :: proc (
 		for diag in diagnostic {
 			for bit, i in diag {
 				if bit == '1' {
-					hitters[i] += 1
+					hitters[ i ] += 1
 				} else {
-					hitters[i] -= 1
+					hitters[ i ] -= 1
 				}
 			}
 		}
@@ -102,10 +100,10 @@ main :: proc (
 		for bit in 0 ..< len( diagnostic[ 0 ] ) {
 			for c, i in co2 {
 				if c[ bit ] == '1' {
-					if i > len( co2 ) / 2 {
-						co2 = co2[ i : ]
-					} else {
+					if i <= len( co2 ) / 2 {
 						co2 = co2[ : i ]
+					} else {
+						co2 = co2[ i : ]
 					}
 					break
 				}

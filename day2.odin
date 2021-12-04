@@ -13,7 +13,7 @@ main :: proc (
 	defer delete( commands )
 
 	{ // Load input data
-		when #config( example, true ) {
+		when #config( example, false ) {
 			data := example_data
 		} else {
 			data, _ := os.read_entire_file( "day2.txt" ); defer delete(  data  )
