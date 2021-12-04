@@ -6,11 +6,15 @@ import "core:slice"
 import "core:strconv"
 import "core:strings"
 
+
+
+Board :: [5][5]int
+
+
+
 main :: proc (
 ) {
 	fmt.println( "Day 4" )
-
-	Board :: [5][5]int
 
 	list   : [       ]int  ; defer delete( list   )
 	boards : [dynamic]Board; defer delete( boards )
@@ -35,65 +39,6 @@ main :: proc (
 			for y in 0 ..< 5 {
 				for x in 0 ..< 5 {
 					board[ y ][ x ] = strconv.atoi( fields[ i + y * 5 + x ] )
-				}
-			}
-		}
-	}
-
-
-
-	calculate_score :: proc (
-		board : Board,
-		value : int,
-	) -> int {
-		score : int
-		for y in 0 ..< 5 {
-			for x in 0 ..< 5 {
-				if board[ y ][ x ] != -1 {
-					score += board[ y ][ x ]
-				}
-			}
-		}
-		score *= value
-		return score
-	}
-
-
-
-	check_board :: proc (
-		board : Board,
-	) -> bool {
-		for y in 0 ..< 5 {
-			row_value : int
-			for x in 0 ..< 5 {
-				row_value += board[ y ][ x ]
-			}
-			if row_value == -1 * 5 {
-				return true
-			}
-		}
-		for x in 0 ..< 5 {
-			column_value : int
-			for y in 0 ..< 5 {
-				column_value += board[ y ][ x ]
-			}
-			if column_value == -1 * 5 {
-				return true
-			}
-		}
-		return false
-	}
-
-
-
-	mark_value :: proc (
-		board : ^Board,
-		value : int,
-	) {
-		for y in 0 ..< 5 {
-			for x in 0 ..< 5 {
-				if  board[ y ][ x ] == value {
-					board[ y ][ x ] = -1
 				}
 			}
 		}
@@ -173,6 +118,67 @@ main :: proc (
 	}
 }
 
+
+
+calculate_score :: proc (
+	board : Board,
+	value : int,
+) -> int {
+	score : int
+	for y in 0 ..< 5 {
+		for x in 0 ..< 5 {
+			if board[ y ][ x ] != -1 {
+				score += board[ y ][ x ]
+			}
+		}
+	}
+	score *= value
+	return score
+}
+
+
+
+check_board :: proc (
+	board : Board,
+) -> bool {
+	for y in 0 ..< 5 {
+		row_value : int
+		for x in 0 ..< 5 {
+			row_value += board[ y ][ x ]
+		}
+		if row_value == -1 * 5 {
+			return true
+		}
+	}
+	for x in 0 ..< 5 {
+		column_value : int
+		for y in 0 ..< 5 {
+			column_value += board[ y ][ x ]
+		}
+		if column_value == -1 * 5 {
+			return true
+		}
+	}
+	return false
+}
+
+
+
+mark_value :: proc (
+	board : ^Board,
+	value : int,
+) {
+	for y in 0 ..< 5 {
+		for x in 0 ..< 5 {
+			if  board[ y ][ x ] == value {
+				board[ y ][ x ] = -1
+			}
+		}
+	}
+}
+
+
+
 example_data := \
 `7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -193,6 +199,8 @@ example_data := \
 18  8 23 26 20
 22 11 13  6  5
  2  0 12  3  7`
+
+
 
 /*
 
