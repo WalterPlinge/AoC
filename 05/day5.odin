@@ -13,8 +13,6 @@ main :: proc() {
 
 	vents : []Line; defer delete(vents)
 
-
-
 	{ // Load the data
 		when #config(example, false) {
 			data := example_data
@@ -35,12 +33,11 @@ main :: proc() {
 		}
 	}
 
-
-
-	fmt.println("\t1) Consider only horizontal and vertical lines. At how many points do at least two lines overlap?")
-
 	{ // Part 1
+		fmt.println("\t1) Consider only horizontal and vertical lines. At how many points do at least two lines overlap?")
+
 		pos : map[Point]int
+
 		for v in vents {
 			p1 := v[0]
 			p2 := v[1]
@@ -69,12 +66,11 @@ main :: proc() {
 		fmt.println("\t\ta)",count)
 	}
 
-
-
-	fmt.println("\t2) Consider all of the lines. At how many points do at least two lines overlap?")
-
 	{ // Part 2
+		fmt.println("\t2) Consider all of the lines. At how many points do at least two lines overlap?")
+
 		pos : map[Point]int
+
 		for v in vents {
 			p1 := v[0]
 			p2 := v[1]
