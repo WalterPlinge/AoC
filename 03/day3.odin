@@ -81,6 +81,26 @@ main :: proc (
 	{ // Part 2
 		slice.sort( diagnostic )
 		oxygen := diagnostic
+		// search := proc (
+		// 	list   : []string       ,
+		// 	common :   bool   = true,
+		// ) -> string {
+		// 	for bit in 0 ..< len( list[ 0 ] ) {
+		// 		for o, i in list {
+		// 			if o[ bit ] == '1' {
+		// 				if i <= len( list ) / 2 && common || !common {
+		// 					list = list[ i : ]
+		// 				} else {
+		// 					list = list[ : i ]
+		// 				}
+		// 				break
+		// 			}
+		// 		}
+		// 		if len( list ) == 1 {
+		// 			break
+		// 		}
+		// 	}
+		// }
 		for bit in 0 ..< len( diagnostic[ 0 ] ) {
 			for o, i in oxygen {
 				if o[ bit ] == '1' {
