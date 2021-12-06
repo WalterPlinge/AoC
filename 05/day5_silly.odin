@@ -54,7 +54,7 @@ main::proc(){
 		fmt.println("\t\tb)",count)
 	}
 	fmt.println("\t2) Consider all of the lines. At how many points do at least two lines overlap?")
-	{ // Part 1
+	{ // Part 2
 		pos:map[Point]int
 		for v in vents{
 			p1:=v[0]
