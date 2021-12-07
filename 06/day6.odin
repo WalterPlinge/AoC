@@ -26,7 +26,7 @@ main :: proc() {
 	}
 
 	fish_spawned :: proc(init, days : int) -> int {
-		// caching to
+		// caching (took time from 1 hour 40 minutes to 1.5ms, is that a 4,000,000% speed up?)
 		Cache_Key :: struct{ init, days : int }
 		@static cache : map[Cache_Key]int
 		if v, ok := cache[{init, days}]; ok {
