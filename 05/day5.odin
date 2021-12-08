@@ -4,8 +4,11 @@ import "core:fmt"
 import "core:os"
 import "core:strconv"
 import "core:strings"
+import "core:time"
 
 main :: proc() {
+	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
+
 	fmt.println("Day 5")
 
 	Point :: [2]int

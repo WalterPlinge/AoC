@@ -9,9 +9,9 @@ import "core:strings"
 import "core:time"
 
 main :: proc() {
-	fmt.println("Day", DAY)
-
 	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
+
+	fmt.println("Day", DAY)
 
 	crabs : []int; defer delete(crabs)
 
