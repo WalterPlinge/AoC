@@ -50,10 +50,9 @@ main :: proc() {
 				continue
 			}
 
-			for p := p1; p != p2; p += d {
+			for p := p1; p != p2 + d; p += d {
 				pos[p] += 1
 			}
-			pos[p2] += 1
 		}
 
 		count := 0
@@ -79,10 +78,9 @@ main :: proc() {
 				max(min(p2.y - p1.y, 1), -1),
 			}
 
-			for p := p1; p != p2; p += d {
+			for p := p1; p != p2 + d; p += d {
 				pos[p] += 1
 			}
-			pos[p2] += 1
 		}
 
 		count := 0
