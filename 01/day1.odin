@@ -5,9 +5,12 @@ import "core:math"
 import "core:os"
 import "core:strconv"
 import "core:strings"
+import "core:time"
 
 main :: proc (
 ) {
+	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
+
 	fmt.println( "\nDay 1" )
 
 	sonar : [] int

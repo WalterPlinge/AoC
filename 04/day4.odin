@@ -5,6 +5,7 @@ import "core:os"
 import "core:slice"
 import "core:strconv"
 import "core:strings"
+import "core:time"
 
 
 
@@ -14,6 +15,8 @@ Board :: [5][5]int
 
 main :: proc (
 ) {
+	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
+
 	fmt.println( "Day 4" )
 
 	list   : [       ]int  ; defer delete( list   )

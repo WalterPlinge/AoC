@@ -5,9 +5,12 @@ import "core:os"
 import "core:slice"
 import "core:strconv"
 import "core:strings"
+import "core:time"
 
 main :: proc (
 ) {
+	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
+
 	fmt.println( "Day 3" )
 
 	diagnostic : []string

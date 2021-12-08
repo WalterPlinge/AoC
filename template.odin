@@ -2,8 +2,11 @@ package template
 
 import "core:fmt"
 import "core:os"
+import "core:time"
 
 main :: proc() {
+	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
+
 	fmt.println("Day", DAY)
 
 	{ // Load the data
