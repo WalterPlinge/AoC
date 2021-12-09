@@ -62,6 +62,13 @@ main :: proc() {
 		fmt.println("\t\ta)", total)
 	}
 
+	{ // Part 1 (version 2, credit: everyone else)
+		// ages : map[int]int
+		// for f in fish {
+		// 	ages[f] += 1
+		// }
+	}
+
 	{ // Part 2
 		fmt.println("\t2)", QUESTION_2)
 
