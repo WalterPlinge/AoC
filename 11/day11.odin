@@ -52,6 +52,7 @@ mem_tracked_main :: proc() {
 				if grid[i] > 9 && container.set_not_in(flashed, u64(i)) {
 					if step < 100 do flashes += 1
 					simultaneous_flashes += 1
+
 					container.set_add(&flashed, u64(i))
 					minx := -1 if p.x > 0 else 0
 					miny := -1 if p.y > 0 else 0
