@@ -15,25 +15,20 @@ mem_tracked_main :: proc() {
 
 	fmt.println("Day", DAY)
 
-	{ // Load the data
-		when #config(example, false) {
-			data := EXAMPLE_DATA
-		} else {
-			data, _ := os.read_entire_file(DAY_DATA); defer delete(data)
-		}
+	// Load the data
+	data : []byte; defer delete(data)
+	switch #config(example, 0) {
+		case 0: data, _ = os.read_entire_file(DAY_DATA)
+		case 1: data = transmute([]byte) EXAMPLE_DATA
 	}
 
-	{ // Part 1
-		fmt.println("\t1)", QUESTION_1)
+	// Part 1
+	fmt.println("\t1)", QUESTION_1)
+	fmt.println("\t\ta)")
 
-		fmt.println("\t\ta)")
-	}
-
-	{ // Part 2
-		fmt.println("\t2)", QUESTION_2)
-
-		fmt.println("\t\ta)")
-	}
+	// Part 2
+	fmt.println("\t2)", QUESTION_2)
+	fmt.println("\t\ta)")
 }
 
 DAY :: 0
