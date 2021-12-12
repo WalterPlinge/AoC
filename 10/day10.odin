@@ -1,4 +1,4 @@
-package template
+package day_10
 
 import "core:fmt"
 import "core:math"

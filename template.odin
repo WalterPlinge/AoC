@@ -1,10 +1,16 @@
 package template
 
+
 import "core:fmt"
+import "core:math"
+import "core:mem"
 import "core:os"
+import "core:slice"
+import "core:strconv"
+import "core:strings"
 import "core:time"
 
-main :: proc() {
+mem_tracked_main :: proc() {
 	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
 
 	fmt.println("Day", DAY)
@@ -41,3 +47,20 @@ EXAMPLE_DATA := ``
 /*
 
 */
+
+main :: proc() {
+	track : mem.Tracking_Allocator
+	mem.tracking_allocator_init(&track, context.allocator)
+	defer mem.tracking_allocator_destroy(&track)
+
+	context.allocator = mem.tracking_allocator(&track)
+
+	mem_tracked_main()
+
+	if len(track.allocation_map) > 0 {
+		fmt.println()
+		for _, v in track.allocation_map {
+			fmt.printf("%v - leaked %v bytes\n", v.location, v.size)
+		}
+	}
+}
