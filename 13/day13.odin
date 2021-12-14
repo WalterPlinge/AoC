@@ -44,8 +44,8 @@ mem_tracked_main :: proc() {
 		for p := 0; p < len(points); p += 1 {
 			new_point := points[p]
 			switch f.axis {
-				case .X: new_point.x = f.value - abs(f.value - points[p].x)
-				case .Y: new_point.y = f.value - abs(f.value - points[p].y)
+				case .X: new_point.x = f.value - abs(f.value - new_point.x)
+				case .Y: new_point.y = f.value - abs(f.value - new_point.y)
 			}
 			if points[p] != new_point && slice.contains(points[:], new_point) {
 				unordered_remove(&points, p)
