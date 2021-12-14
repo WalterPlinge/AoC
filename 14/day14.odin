@@ -70,7 +70,6 @@ mem_tracked_main :: proc() {
 		return
 	}
 
-	common : map[rune]int; defer delete(common)
 	min_max :: proc(m : map[rune]int) -> (int, int) {
 		minf, maxf := max(int), min(int)
 		for k, v in m {
@@ -80,6 +79,7 @@ mem_tracked_main :: proc() {
 		return minf, maxf
 	}
 
+	common : map[rune]int; defer delete(common)
 	common = find_counts(template, rules, 10, &cache)
 	for t in template do common[t] += 1
 	min1, max1 := min_max(common)
