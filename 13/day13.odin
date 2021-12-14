@@ -1,16 +1,12 @@
 package day_13
 
-import "core:container"
 import "core:fmt"
-import la "core:math/linalg"
-import "core:math"
 import "core:mem"
 import "core:os"
 import "core:slice"
 import "core:strconv"
 import "core:strings"
 import "core:time"
-import "core:unicode"
 
 mem_tracked_main :: proc() {
 	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
@@ -48,8 +44,8 @@ mem_tracked_main :: proc() {
 		for p := 0; p < len(points); p += 1 {
 			new_point := points[p]
 			switch f.axis {
-				case .X: new_point.x = f.value - la.abs(f.value - points[p].x)
-				case .Y: new_point.y = f.value - la.abs(f.value - points[p].y)
+				case .X: new_point.x = f.value - abs(f.value - points[p].x)
+				case .Y: new_point.y = f.value - abs(f.value - points[p].y)
 			}
 			if points[p] != new_point && slice.contains(points[:], new_point) {
 				unordered_remove(&points, p)
