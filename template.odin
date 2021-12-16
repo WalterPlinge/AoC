@@ -1,6 +1,5 @@
 package template
 
-import "core:container"
 import "core:fmt"
 import la "core:math/linalg"
 import "core:math"
