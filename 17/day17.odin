@@ -42,12 +42,6 @@ mem_tracked_main :: proc() {
 		}
 	}
 
-	between :: proc(v, a, b : int) -> bool { return a <= v && v <= b }
-
-	is_in_area :: proc(p : Point, a : Area) -> bool {
-		return between(p.x, a[0].x, a[1].x) && between(p.y, a[0].y, a[1].y)
-	}
-
 	min_vel := Point{}
 	max_vel := Point{}
 	for n := 0; n < area[1].x; n += 1 {
@@ -72,7 +66,7 @@ mem_tracked_main :: proc() {
 			v.x += -1 if v.x > 0 else 1 if v.x < 0 else 0
 			v.y += -1
 			if p.x > area[1].x || p.y < area[0].y do break
-			if is_in_area(p, area) {
+			if p.x > area[1].x && p.y < area[1].y {
 				velocities += 1
 				break
 			}
