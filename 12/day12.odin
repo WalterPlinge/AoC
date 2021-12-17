@@ -1,4 +1,4 @@
-package template
+package day_12
 
 
 import "core:fmt"
