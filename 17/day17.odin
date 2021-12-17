@@ -71,6 +71,7 @@ mem_tracked_main :: proc() {
 			p += v
 			v.x += -1 if v.x > 0 else 1 if v.x < 0 else 0
 			v.y += -1
+			if p.x > area[1].x || p.y < area[0].y do break
 			if is_in_area(p, area) {
 				velocities += 1
 				break
