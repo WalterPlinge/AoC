@@ -1,8 +1,8 @@
 package template
 
 import "core:fmt"
-import la "core:math/linalg"
 import "core:math"
+import la "core:math/linalg"
 import "core:mem"
 import "core:os"
 import "core:slice"
