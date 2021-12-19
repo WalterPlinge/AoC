@@ -24,7 +24,7 @@ mem_tracked_main :: proc() {
 
 	lines := strings.fields(string(data)); defer delete(lines)
 
-	Value :: struct { value, level, side : int }
+	Value :: struct { value, level : int }
 	Snailfish :: [dynamic]Value
 
 	list := make([]Snailfish, len(lines)); defer delete(list)
@@ -32,18 +32,15 @@ mem_tracked_main :: proc() {
 
 	for l, i in lines {
 		current := &list[i]
-		level, side := 0, 0
+		level := 0
 		for c, i in l {
 			switch c {
 				case '[':
 					level += 1
-					side = 0
 				case ']':
 					level -= 1
 				case '0'..'9':
-					append(current, Value{ int(c - '0'), level, side })
-				case ',':
-					side = 1
+					append(current, Value{ int(c - '0'), level })
 			}
 		}
 	}
@@ -74,19 +71,8 @@ mem_tracked_main :: proc() {
 
 			ordered_remove(s, next)
 
-			if i > 0 {
-				s[prev].value += lhs
-				if s[prev].level == current.level {
-					current.side = 1 if s[prev].side == 0 else 0
-				}
-			}
-
-			if next < len(s) {
-				s[next].value += rhs
-				if s[next].level == current.level {
-					current.side = 0 if s[next].side == 1 else 1
-				}
-			}
+			if i > 0 do s[prev].value += lhs
+			if next < len(s) do s[next].value += rhs
 
 			return true
 		}
@@ -97,9 +83,8 @@ mem_tracked_main :: proc() {
 
 			current.value  = first
 			current.level += 1
-			current.side   = 0
 
-			insert_at_elem(s, i + 1, Value{ second, current.level, 1 })
+			insert_at_elem(s, i + 1, Value{ second, current.level })
 
 			return true
 		}
@@ -118,16 +103,8 @@ mem_tracked_main :: proc() {
 					current.value = 3 * current.value + 2 * work[next].value
 					ordered_remove(&work, next)
 
-					if current.level == 1 {
-						break
-					}
-
-					current.level -= 1
-
-					if i > 0 && current.level == s[prev].level {
-						current.side = 1 if s[prev].side == 0 else 0
-					} else if next < len(s) && current.level == s[next].level {
-						current.side = 0 if s[next].side == 1 else 1
+					if current.level > 1 {
+						current.level -= 1
 					}
 
 					break
