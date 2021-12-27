@@ -1,15 +1,11 @@
 package day22
 
 import "core:fmt"
-import "core:math"
-import la "core:math/linalg"
 import "core:mem"
 import "core:os"
-import "core:slice"
 import "core:strconv"
 import "core:strings"
 import "core:time"
-import "core:unicode"
 
 mem_tracked_main :: proc() {
 	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
