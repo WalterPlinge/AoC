@@ -21,7 +21,8 @@ mem_tracked_main :: proc() {
 
 	steps_data := strings.split(string(data), "\n"); defer delete(steps_data)
 
-	Box   :: [2][3]int
+	Point :: [3]int
+	Box   :: [2]Point
 	Step  :: struct { on : bool, box : Box }
 	print_step :: proc(s : Step) { fmt.printf("{} x={}..{},y={}..{},z={}..{}\n", "on" if s.on else "off", s.box[0].x, s.box[1].x, s.box[0].y, s.box[1].y, s.box[0].z, s.box[1].z) }
 
@@ -85,62 +86,70 @@ mem_tracked_main :: proc() {
 		return out
 	}
 
-	test_boxes_on := 0
-	for z in -50 ..= 50 {
-		for y in -50 ..= 50 {
-			for x in -50 ..= 50 {
-				for s := len(steps) - 1; s >= 0; s -= 1 {
-					if in_box({x, y, z}, steps[s].box) {
-						if steps[s].on {
-							test_boxes_on += 1
-						}
-						break
-					}
+	append_steps_no_overlap :: proc(array : ^[dynamic]Step, arg : [dynamic]Step) {
+		/*
+			for each step from last to first,
+			divide each box into sub-boxes that don't overlap with any previous box.
+			this will result in a list of boxes that represent each cell's final value,
+			then we can just add up the volume of each box.
+		*/
+		for s := len(arg) - 1; s >= 0; s -= 1 {
+			// working set of boxes that don't overlap
+			working := [dynamic]Box{ arg[s].box }; defer delete(working)
+			for next in array {
+				for w := 0; w < len(working); w += 1 {
+					if !box_overlap(working[w], next.box) do continue
+
+					sub_boxes := subtract_box(working[w], next.box); defer delete(sub_boxes)
+					unordered_remove(&working, w)
+					insert_at_elems(&working, w, ..sub_boxes[:])
+					// if there are no sub-boxes, then it was completely encompassed, but we still need to account for the remove
+					w += len(sub_boxes) - 1
 				}
 			}
-		}
-	}
 
-	/*
-		for each step from last to first,
-		divide each box into sub-boxes that don't overlap with any previous box.
-		this will result in a list of boxes that represent each cell's final value,
-		then we can just add up the volume of each box.
-	*/
-	divided_steps : [dynamic]Step; defer delete(divided_steps)
-	for s := len(steps) - 1; s >= 0; s -= 1 {
-		// working set of boxes that don't overlap
-		working := [dynamic]Box{ steps[s].box }; defer delete(working)
-		for sr in divided_steps {
-			for w := 0; w < len(working); w += 1 {
-				if !box_overlap(working[w], sr.box) do continue
-
-				// we only get here if the current working box overlaps
-				sub_boxes := subtract_box(working[w], sr.box); defer delete(sub_boxes)
-				unordered_remove(&working, w)
-				insert_at_elems(&working, w, ..sub_boxes[:])
-				// if there are no sub-boxes, then it was completely encompassed, but we still need to account for the remove
-				w += len(sub_boxes) - 1
+			for w in working {
+				append(array, Step{ arg[s].on, w })
 			}
 		}
-		for w in working {
-			append(&divided_steps, Step{ steps[s].on, w })
-		}
 	}
 
-	total_cubes_on := 0
-	for ds in divided_steps {
-		if !ds.on do continue
-		total_cubes_on += box_size(ds.box)
+
+
+	init_reactor_boxes := subtract_box(
+		Box{ (Point{} + 1) * min(int), (Point{} + 1) * max(int) },
+		Box{ (Point{} + 1) * -50     , (Point{} + 1) * 50       },
+	); defer delete(init_reactor_boxes)
+
+	init_reactor : [dynamic]Step; defer delete(init_reactor)
+	for irb in init_reactor_boxes do append(&init_reactor, Step{ false, irb })
+
+	append_steps_no_overlap(&init_reactor, steps)
+
+	init_cells_on := 0
+	for ir in init_reactor {
+		if !ir.on do continue
+		init_cells_on += box_size(ir.box)
 	}
 
 	// Part 1
 	fmt.println("\t1)", QUESTION_1)
-	fmt.println("\t\ta)", test_boxes_on) // why off by one ?
+	fmt.println("\t\ta)", init_cells_on)
+
+
+
+	full_reactor : [dynamic]Step; defer delete(full_reactor)
+	append_steps_no_overlap(&full_reactor, steps)
+
+	total_cells_on := 0
+	for fr in full_reactor {
+		if !fr.on do continue
+		total_cells_on += box_size(fr.box)
+	}
 
 	// Part 2
 	fmt.println("\t2)", QUESTION_2)
-	fmt.println("\t\ta)", total_cubes_on)
+	fmt.println("\t\ta)", total_cells_on)
 }
 
 DAY :: 22
