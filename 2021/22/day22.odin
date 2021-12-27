@@ -123,7 +123,7 @@ mem_tracked_main :: proc() {
 				sub_boxes := subtract_box(working[w], sr.box); defer delete(sub_boxes)
 				unordered_remove(&working, w)
 				insert_at_elems(&working, w, ..sub_boxes[:])
-				// if there are no sub-boxes, then it was completely encompassed, so we still need to reset w to account for the remove
+				// if there are no sub-boxes, then it was completely encompassed, but we still need to account for the remove
 				w += len(sub_boxes) - 1
 			}
 		}
