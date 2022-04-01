@@ -1,15 +1,11 @@
 package day22
 
 import "core:fmt"
-import "core:math"
-import la "core:math/linalg"
 import "core:mem"
 import "core:os"
-import "core:slice"
 import "core:strconv"
 import "core:strings"
 import "core:time"
-import "core:unicode"
 
 mem_tracked_main :: proc() {
 	start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
@@ -25,9 +21,10 @@ mem_tracked_main :: proc() {
 
 	steps_data := strings.split(string(data), "\n"); defer delete(steps_data)
 
-	Box   :: [3][2]int
-	Step  :: struct { on : bool, box : [3][2]int }
-	print_step :: proc(s : Step) { fmt.printf("{} x={}..{},y={}..{},z={}..{}\n", "on" if s.on else "off", s.box.x[0], s.box.x[1], s.box.y[0], s.box.y[1], s.box.z[0], s.box.z[1]) }
+	Point :: [3]int
+	Box   :: [2]Point
+	Step  :: struct { on : bool, box : Box }
+	print_step :: proc(s : Step) { fmt.printf("{} x={}..{},y={}..{},z={}..{}\n", "on" if s.on else "off", s.box[0].x, s.box[1].x, s.box[0].y, s.box[1].y, s.box[0].z, s.box[1].z) }
 
 	steps : [dynamic]Step; defer delete(steps)
 
@@ -43,86 +40,116 @@ mem_tracked_main :: proc() {
 		for coord, coord_index in coords {
 			min_max := strings.split(coord[2:], ".."); defer delete(min_max)
 
-			step.box[coord_index][0] = strconv.atoi(min_max[0])
-			step.box[coord_index][1] = strconv.atoi(min_max[1])
+			step.box[0][coord_index] = strconv.atoi(min_max[0])
+			step.box[1][coord_index] = strconv.atoi(min_max[1])
 		}
 	}
 
-	between_int :: proc(v, a, b : int) -> bool { return v >= a && v <= b }
-	between_vec :: proc(v : int, a : [2]int) -> bool { return v >= a[0] && v <= a[1] }
-	between :: proc{ between_int, between_vec }
-	in_box  :: proc(p : [3]int, c : Box) -> bool {
-		return \
-			between(p.x, c.x) &&
-			between(p.y, c.y) &&
-			between(p.z, c.z)
-	}
-	// FIXME: this only accounts for overlapping corners
-	box_overlap :: proc(a, b : Box) -> bool {
-		return \
-			a.x[0] <= b.x[1] && a.x[1] >= b.x[0] &&
-			a.y[0] <= b.y[1] && a.y[1] >= b.y[0] &&
-			a.z[0] <= b.z[1] && a.z[1] >= b.z[0]
+	between :: proc(v, a, b : int) -> bool { return v >= a && v <= b }
+
+	box_size :: proc(b : Box) -> int {
+		d := b[1] - b[0] + 1
+		return d.x * d.y * d.z
 	}
 
-	test_cubes_on := 0
-	for z in -50 ..= 50 {
-		for y in -50 ..= 50 {
-			for x in -50 ..= 50 {
-				for s := len(steps) - 1; s >= 0; s -= 1 {
-					if in_box({x, y, z}, steps[s].box) {
-						if steps[s].on {
-							test_cubes_on += 1
-						}
-						break
-					}
+	in_box  :: proc(p : [3]int, c : Box) -> bool {
+		return \
+			between(p.x, c[0].x, c[1].x) &&
+			between(p.y, c[0].y, c[1].y) &&
+			between(p.z, c[0].z, c[1].z)
+	}
+
+	box_overlap :: proc(a, b : Box) -> bool {
+		return \
+			a[0].x <= b[1].x && a[1].x >= b[0].x &&
+			a[0].y <= b[1].y && a[1].y >= b[0].y &&
+			a[0].z <= b[1].z && a[1].z >= b[0].z
+	}
+
+	subtract_box :: proc(a, b : Box) -> [dynamic]Box {
+		out : [dynamic]Box
+		dividing := a
+		for coord in 0 ..< 3 {
+			if between(b[0][coord], a[0][coord], a[1][coord]) {
+				full := dividing
+				full[1][coord] = b[0][coord] - 1
+				append(&out, full)
+				dividing[0][coord] = b[0][coord]
+			}
+			if between(b[1][coord], a[0][coord], a[1][coord]) {
+				full := dividing
+				full[0][coord] = b[1][coord] + 1
+				append(&out, full)
+				dividing[1][coord] = b[1][coord]
+			}
+		}
+		return out
+	}
+
+	append_steps_no_overlap :: proc(array : ^[dynamic]Step, arg : [dynamic]Step) {
+		/*
+			for each step from last to first,
+			divide each box into sub-boxes that don't overlap with any previous box.
+			this will result in a list of boxes that represent each cell's final value,
+			then we can just add up the volume of each box.
+		*/
+		for s := len(arg) - 1; s >= 0; s -= 1 {
+			// working set of boxes that don't overlap
+			working := [dynamic]Box{ arg[s].box }; defer delete(working)
+			for next in array {
+				for w := 0; w < len(working); w += 1 {
+					if !box_overlap(working[w], next.box) do continue
+
+					sub_boxes := subtract_box(working[w], next.box); defer delete(sub_boxes)
+					unordered_remove(&working, w)
+					insert_at_elems(&working, w, ..sub_boxes[:])
+					// if there are no sub-boxes, then it was completely encompassed, but we still need to account for the remove
+					w += len(sub_boxes) - 1
 				}
+			}
+
+			for w in working {
+				append(array, Step{ arg[s].on, w })
 			}
 		}
 	}
 
-	for s in steps[1:] {
-		if box_overlap(steps[0].box, s.box) {
-			fmt.println(steps[0].box)
-			fmt.println(s.box)
-			fmt.println("")
-		}
-	}
 
-	// far too slow, rectangle overlap instead?
-	// min, max : [3]int
-	// for s in steps {
-	// 	for c, ci in s.box[0] {
-	// 		if s.box[0][ci] < min[ci] do min[ci] = s.box[0][ci]
-	// 		if s.box[1][ci] > max[ci] do max[ci] = s.box[1][ci]
-	// 	}
-	// }
-	// range := max - min
-	// fmt.println(min, max, range.x * range.y * range.z)
-	total_cubes_on := 0
-	// for z in min.z ..= max.z {
-	// 	for y in min.y ..= max.y {
-	// 		fmt.println(y)
-	// 		for x in min.x ..= max.x {
-	// 			for s := len(steps) - 1; s >= 0; s -= 1 {
-	// 				if in_box({x, y, z}, steps[s].box) {
-	// 					if steps[s].on {
-	// 						total_cubes_on += 1
-	// 					}
-	// 					break
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
+
+	init_reactor_boxes := subtract_box(
+		Box{ (Point{} + 1) * min(int), (Point{} + 1) * max(int) },
+		Box{ (Point{} + 1) * -50     , (Point{} + 1) * 50       },
+	); defer delete(init_reactor_boxes)
+
+	init_reactor : [dynamic]Step; defer delete(init_reactor)
+	for irb in init_reactor_boxes do append(&init_reactor, Step{ false, irb })
+
+	append_steps_no_overlap(&init_reactor, steps)
+
+	init_cells_on := 0
+	for ir in init_reactor {
+		if !ir.on do continue
+		init_cells_on += box_size(ir.box)
+	}
 
 	// Part 1
 	fmt.println("\t1)", QUESTION_1)
-	fmt.println("\t\ta)", test_cubes_on) // why off by one ?
+	fmt.println("\t\ta)", init_cells_on)
+
+
+
+	full_reactor : [dynamic]Step; defer delete(full_reactor)
+	append_steps_no_overlap(&full_reactor, steps)
+
+	total_cells_on := 0
+	for fr in full_reactor {
+		if !fr.on do continue
+		total_cells_on += box_size(fr.box)
+	}
 
 	// Part 2
 	fmt.println("\t2)", QUESTION_2)
-	fmt.println("\t\ta)", total_cubes_on)
+	fmt.println("\t\ta)", total_cells_on)
 }
 
 DAY :: 22
@@ -268,6 +295,8 @@ The last two steps are fully outside the initialization procedure area; all othe
 
 Execute the reboot steps. Afterward, considering only cubes in the region x=-50..50,y=-50..50,z=-50..50, how many cubes are on?
 
+Your puzzle answer was 580098.
+
 --- Part Two ---
 
 Now that the initialization procedure is complete, you can reboot the reactor.
@@ -340,6 +369,8 @@ off x=-93533..-4276,y=-16170..68771,z=-104985..-24507
 After running the above reboot steps, 2758514936282235 cubes are on. (Just for fun, 474140 of those are also in the initialization procedure region.)
 
 Starting again with all cubes off, execute all reboot steps. Afterward, considering all cubes, how many cubes are on?
+
+Your puzzle answer was 1134725012490723.
 
 */
 
