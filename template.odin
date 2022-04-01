@@ -36,18 +36,22 @@ main :: proc() {
 	}
 
 	// data loading
-	defer if raw_data(PROBLEM_DATA) != raw_data(EXAMPLE_DATA) do delete(PROBLEM_DATA)
 	if slice.contains(os.args, "-example") {
 		PROBLEM_DATA = transmute([]byte) EXAMPLE_DATA
 	} else {
 		PROBLEM_DATA, _ = os.read_entire_file("input")
 	}
+	defer if raw_data(PROBLEM_DATA) != raw_data(EXAMPLE_DATA) {
+		delete(PROBLEM_DATA)
+	}
 
 	// puzzle
 	fmt.println("Day", DAY)
 	{
-		start := time.now(); defer fmt.println("Time: ", time.diff(start, time.now()))
+		start := time.now()
 		puzzle()
+		end := time.now()
+		fmt.println("Time: ", time.diff(start, end))
 	}
 	fmt.println("\t1)", ANSWER_1)
 	fmt.println("\t2)", ANSWER_2)
@@ -60,6 +64,7 @@ main :: proc() {
 			puzzle()
 		}
 		duration := time.diff(start, time.now())
-		fmt.println("Average time: ", duration / time.Duration(iterations))
+		average := duration / time.Duration(iterations)
+		fmt.println("Average time: ", average)
 	}
 }
