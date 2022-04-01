@@ -58,7 +58,7 @@ main :: proc() {
 
 	// benchmark
 	if slice.contains(os.args, "-benchmark") {
-		iterations := 100
+		iterations := 10
 		start := time.now()
 		for i in 0 ..< iterations {
 			puzzle()
