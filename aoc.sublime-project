@@ -10,31 +10,31 @@
 		{
 			"name": "build",
 			"selector": "source.odin",
-			"shell_cmd": "odin build $file -show-timings",
+			"shell_cmd": "odin build $file -file -show-timings",
 			"working_dir": "$file_path",
 		},
 		{
 			"name": "check",
 			"selector": "source.odin",
-			"shell_cmd": "odin check $file -show-timings",
+			"shell_cmd": "odin check $file -file -show-timings",
 			"working_dir": "$file_path",
 		},
 		{
 			"name": "run",
 			"selector": "source.odin",
-			"shell_cmd": "odin run $file -show-timings",
+			"shell_cmd": "odin run $file -file -show-timings",
 			"working_dir": "$file_path",
 		},
 		{
 			"name": "run example",
 			"selector": "source.odin",
-			"shell_cmd": "odin run $file -show-timings -- -example",
+			"shell_cmd": "odin run $file -file -show-timings -- -example",
 			"working_dir": "$file_path",
 		},
 		{
 			"name": "run benchmark",
 			"selector": "source.odin",
-			"shell_cmd": "odin run $file -show-timings -- -benchmark",
+			"shell_cmd": "odin run $file -file -show-timings -- -benchmark",
 			"working_dir": "$file_path",
 		}
 	],
