@@ -27,18 +27,15 @@ puzzle :: proc() {
 	for line in strings.split_lines_iterator(&iter) {
 		m := strings.split_multi(line, {"-", ","}, context.temp_allocator)
 		n := slice.mapper(m, strconv.atoi, context.temp_allocator)
-
-		split :: proc(n: []int) -> (int, int, int, int) {
-			return n[0], n[1], n[2], n[3]
+		s := [2][2]int{{n[0], n[1]}, {n[2], n[3]}}
+		contains :: proc(a, b: [2]int) -> bool {
+			return a.x <= b.x && a.y >= b.y
 		}
-		contains :: proc(ax, ay, bx, by: int) -> bool {
-			return ax <= bx && ay >= by
+		overlap :: proc(a, b: [2]int) -> bool {
+			return a.x <= b.y && a.y >= b.x
 		}
-		overlap :: proc(ax, ay, bx, by: int) -> bool {
-			return ax <= by && ay >= bx
-		}
-		ANSWER_1 += int(contains(split(n)) || contains(split(n)))
-		ANSWER_2 += int(overlap(split(n)))
+		ANSWER_1 += int(contains(s.x, s.y) || contains(s.y, s.x))
+		ANSWER_2 += int(overlap(s.x, s.y))
 	}
 }
 
