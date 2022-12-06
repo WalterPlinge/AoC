@@ -8,33 +8,33 @@
 	"build_systems":
 	[
 		{
-			"name": "build",
+			"name": "check",
 			"selector": "source.odin",
-			"shell_cmd": "odin build $file -file -show-timings",
+			"shell_cmd": "odin check .",
 			"working_dir": "$file_path",
 		},
 		{
-			"name": "check",
+			"name": "build",
 			"selector": "source.odin",
-			"shell_cmd": "odin check $file -file -show-timings",
+			"shell_cmd": "odin build .",
 			"working_dir": "$file_path",
 		},
 		{
 			"name": "run",
 			"selector": "source.odin",
-			"shell_cmd": "odin run $file -file -show-timings",
+			"shell_cmd": "odin run .",
 			"working_dir": "$file_path",
 		},
 		{
 			"name": "run example",
 			"selector": "source.odin",
-			"shell_cmd": "odin run $file -file -show-timings -- -example",
+			"shell_cmd": "odin run . -- -example",
 			"working_dir": "$file_path",
 		},
 		{
 			"name": "run benchmark",
 			"selector": "source.odin",
-			"shell_cmd": "odin run $file -file -show-timings -- -benchmark",
+			"shell_cmd": "odin run . -- -benchmark",
 			"working_dir": "$file_path",
 		}
 	],
