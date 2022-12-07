@@ -40,9 +40,12 @@ $ ls
 7214296 k`
 
 puzzle :: proc() {
-	// this approach is using a tree
-	// there's another approach using a stack and only caring about dir sizes
-	// i would like to try that as well
+	// i heard others do a stack approach
+	// it seems faster, smaller, neater
+	// but i think the input is required to iterate the tree depth-first
+	//stack_approach(); if true do return
+
+	// this was my approach, using a tree
 	Item :: struct {
 		type: enum{FOLDER, FILE},
 		name: string,
@@ -70,6 +73,7 @@ puzzle :: proc() {
 		if line[0] == '$' {
 			cmd := line[2:4]
 			if cmd != "cd" do continue
+			// skipping ls may need the input to iterate the tree depth-first
 
 			dir := line[5:]
 			if dir == "/" {
@@ -134,6 +138,53 @@ puzzle :: proc() {
 		}
 	}
 	ANSWER_2 = items[ddir].size
+}
+
+stack_approach :: proc() {
+	dir_stack: [dynamic]int; defer delete(dir_stack)
+	dir_sizes: [dynamic]int; defer delete(dir_sizes)
+
+	iter := string(PROBLEM_DATA)
+	for line in strings.split_lines_iterator(&iter) {
+		if line[0] == '$' {
+			cmd := line[2:4]
+			if cmd != "cd" do continue
+			dir := line[5:]
+			if dir == ".." {
+				size := pop(&dir_stack)
+				append(&dir_sizes, size)
+				dir_stack[len(dir_stack) - 1] += size
+			} else {
+				append(&dir_stack, 0)
+			}
+		} else if line[0] >= '0' && line[0] <= '9' {
+			dir_stack[len(dir_stack) - 1] += strconv.atoi(line)
+		}
+	}
+
+	root_size := 0
+	for len(dir_stack) != 0 {
+		root_size += pop(&dir_stack)
+		append(&dir_sizes, root_size)
+	}
+
+	LIMIT :: 100_000
+	for d in dir_sizes {
+		if d <= LIMIT {
+			ANSWER_1 += d
+		}
+	}
+
+	TOTAL :: 70_000_000
+	NEEDED :: 30_000_000
+	unused := TOTAL - root_size
+	target := NEEDED - unused
+	ANSWER_2 = root_size
+	for d in dir_sizes {
+		if d > target && d < ANSWER_2 {
+			ANSWER_2 = d
+		}
+	}
 }
 
 /*
