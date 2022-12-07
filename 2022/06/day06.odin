@@ -18,6 +18,7 @@ PROBLEM_DATA: []byte
 EXAMPLE_DATA := `mjqjpqmgbljsphdztnvjfqwrcgsmlb`
 
 puzzle :: proc() {
+	// this is O(nm), getting ~200us
 	search1 :: proc(d: []byte, n: int) -> int {
 		for b in 0 ..< len(d) - n {
 			m: bit_set[byte('a')..='z']
@@ -26,7 +27,8 @@ puzzle :: proc() {
 		}
 		return 0
 	}
-	search2::proc(data: []byte, n: int) -> int {
+	// this is O(n), getting ~73us
+	search2 :: proc(data: []byte, n: int) -> int {
 		freq: [256]int
 		dup, dist: int
 		for c1, i in data {
@@ -42,7 +44,8 @@ puzzle :: proc() {
 		}
 		return dist
 	}
-	search3::proc(data: []byte, n: int) -> int {
+	// i removed the `if dist >= n` branch, getting ~68us
+	search3 :: proc(data: []byte, n: int) -> int {
 		freq: [256]int
 		dup, dist: int
 		dist = n
@@ -61,8 +64,29 @@ puzzle :: proc() {
 		}
 		return dist
 	}
-	ANSWER_1 = search3(PROBLEM_DATA, 4)
-	ANSWER_2 = search3(PROBLEM_DATA, 14)
+	// i removed all branching and reordered `dup == 0`, getting ~61us
+	search4 :: proc(data: []byte, n: int) -> int {
+		freq: [256]int
+		dup, dist: int
+		dist = n
+		for c in data[:n] {
+			freq[c] += 1
+			dup += int(freq[c] > 1)
+		}
+		if dup == 0 do return dist
+		for c1, i in data[n:] {
+			c2 := data[i]
+			freq[c1] += 1
+			dup += int(freq[c1] > 1)
+			dup -= int(freq[c2] > 1)
+			if dup == 0 do return dist
+			freq[c2] -= 1
+			dist += 1
+		}
+		return dist
+	}
+	ANSWER_1 = search4(PROBLEM_DATA, 4)
+	ANSWER_2 = search4(PROBLEM_DATA, 14)
 }
 
 /*
