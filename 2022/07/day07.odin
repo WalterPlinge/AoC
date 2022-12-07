@@ -40,6 +40,9 @@ $ ls
 7214296 k`
 
 puzzle :: proc() {
+	// this approach is using a tree
+	// there's another approach using a stack and only caring about dir sizes
+	// i would like to try that as well
 	Item :: struct {
 		type: enum{FOLDER, FILE},
 		name: string,
