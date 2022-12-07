@@ -79,7 +79,7 @@ puzzle :: proc() {
 			freq[c1] += 1
 			dup += int(freq[c1] > 1)
 			dup -= int(freq[c2] > 1)
-			if dup == 0 do return dist
+			if dup == 0 do return dist + 1
 			freq[c2] -= 1
 			dist += 1
 		}
