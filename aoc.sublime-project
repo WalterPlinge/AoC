@@ -26,6 +26,12 @@
 			"working_dir": "$file_path",
 		},
 		{
+			"name": "run (speed)",
+			"selector": "source.odin",
+			"shell_cmd": "odin run . -o:speed",
+			"working_dir": "$file_path",
+		},
+		{
 			"name": "run example",
 			"selector": "source.odin",
 			"shell_cmd": "odin run . -- -example",
@@ -35,6 +41,12 @@
 			"name": "run benchmark",
 			"selector": "source.odin",
 			"shell_cmd": "odin run . -- -benchmark",
+			"working_dir": "$file_path",
+		},
+		{
+			"name": "run benchmark (speed)",
+			"selector": "source.odin",
+			"shell_cmd": "odin run . -o:speed -- -benchmark",
 			"working_dir": "$file_path",
 		}
 	],

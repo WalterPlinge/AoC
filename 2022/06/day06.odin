@@ -18,7 +18,11 @@ PROBLEM_DATA: []byte
 EXAMPLE_DATA := `mjqjpqmgbljsphdztnvjfqwrcgsmlb`
 
 puzzle :: proc() {
-	// this is O(nm), getting ~200us
+	// all my speed values are without compiler optimisations lol
+	// i seem to get ~200us, ~73us, ~68us, ~61us
+	// with -o:speed ~32.5us, ~8.5us, ~7.9us, ~6.2us
+
+	// this is O(nm)
 	search1 :: proc(d: []byte, n: int) -> int {
 		for b in 0 ..< len(d) - n {
 			m: bit_set[byte('a')..='z']
@@ -27,7 +31,7 @@ puzzle :: proc() {
 		}
 		return 0
 	}
-	// this is O(n), getting ~73us
+	// this is O(n)
 	search2 :: proc(data: []byte, n: int) -> int {
 		freq: [256]int
 		dup, dist: int
@@ -44,7 +48,7 @@ puzzle :: proc() {
 		}
 		return dist
 	}
-	// i removed the `if dist >= n` branch, getting ~68us
+	// i removed the `if dist >= n` branch
 	search3 :: proc(data: []byte, n: int) -> int {
 		freq: [256]int
 		dup, dist: int
@@ -64,7 +68,7 @@ puzzle :: proc() {
 		}
 		return dist
 	}
-	// i removed all branching and reordered `dup == 0`, getting ~61us
+	// i removed all branching and reordered `dup == 0`
 	search4 :: proc(data: []byte, n: int) -> int {
 		freq: [256]int
 		dup, dist: int
