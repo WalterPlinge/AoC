@@ -18,7 +18,7 @@ PROBLEM_DATA: []byte
 EXAMPLE_DATA := `mjqjpqmgbljsphdztnvjfqwrcgsmlb`
 
 puzzle :: proc() {
-	search :: proc(d: []byte, n: int) -> int {
+	search1 :: proc(d: []byte, n: int) -> int {
 		for b in 0 ..< len(d) - n {
 			m: bit_set[byte('a')..='z']
 			for c in 0 ..< n do m |= {d[b + c]}
@@ -26,8 +26,43 @@ puzzle :: proc() {
 		}
 		return 0
 	}
-	ANSWER_1 = search(PROBLEM_DATA, 4)
-	ANSWER_2 = search(PROBLEM_DATA, 14)
+	search2::proc(data: []byte, n: int) -> int {
+		freq: [256]int
+		dup, dist: int
+		for c1, i in data {
+			freq[c1] += 1
+			if freq[c1] > 1 do dup += 1
+			if dist >= n {
+				c2 := data[i - n]
+				if freq[c2] > 1 do dup -= 1
+				freq[c2] -= 1
+			}
+			dist += 1
+			if dist >= n && dup == 0 do break
+		}
+		return dist
+	}
+	search3::proc(data: []byte, n: int) -> int {
+		freq: [256]int
+		dup, dist: int
+		dist = n
+		for c, i in data[:n] {
+			freq[c] += 1
+			if freq[c] > 1 do dup += 1
+		}
+		for c1, i in data[n:] {
+			c2 := data[i]
+			freq[c1] += 1
+			if freq[c1] > 1 do dup += 1
+			if freq[c2] > 1 do dup -= 1
+			freq[c2] -= 1
+			dist += 1
+			if dup == 0 do break
+		}
+		return dist
+	}
+	ANSWER_1 = search3(PROBLEM_DATA, 4)
+	ANSWER_2 = search3(PROBLEM_DATA, 14)
 }
 
 /*
@@ -121,7 +156,7 @@ main :: proc() {
 
 	// benchmark
 	if slice.contains(os.args, "-benchmark") {
-		iterations := 10
+		iterations := 1000
 		start := time.now()
 		for i in 0 ..< iterations {
 			puzzle()
