@@ -40,13 +40,11 @@ main :: proc() {
 
 	// data loading
 	if slice.contains(os.args, "-example") {
-		PROBLEM_DATA = transmute([]byte) EXAMPLE_DATA
+		PROBLEM_DATA = slice.clone(transmute([]byte) EXAMPLE_DATA)
 	} else {
 		PROBLEM_DATA, _ = os.read_entire_file("input")
 	}
-	defer if raw_data(PROBLEM_DATA) != raw_data(EXAMPLE_DATA) {
-		delete(PROBLEM_DATA)
-	}
+	defer delete(PROBLEM_DATA)
 
 	// puzzle
 	fmt.println("Day", DAY)
