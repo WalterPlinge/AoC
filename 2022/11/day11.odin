@@ -122,18 +122,17 @@ puzzle :: proc() {
 
 		monkeys := monkeys
 		for round in 0 ..< rounds {
-			for n in 0 ..< len(monkeys) {
-				m := &monkeys[n]
+			for m, n in &monkeys {
 				checks[n] += len(m.items)
+				slice.reverse(m.items[:])
 				for len(m.items) > 0 {
-					item := pop_front(&m.items)
+					item := pop(&m.items)
 
 					lhs := item if m.op.lhs.type == .REF else m.op.lhs.val
 					rhs := item if m.op.rhs.type == .REF else m.op.rhs.val
-					switch m.op.type {
-					case .ADD:
+					if m.op.type == .ADD {
 						item = lhs + rhs
-					case .MUL:
+					} else if m.op.type == .MUL {
 						item = lhs * rhs
 					}
 
