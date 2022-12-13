@@ -44,7 +44,7 @@ puzzle :: proc() {
 		}
 	}
 
-	search :: proc(m: []string, start: [2]int, find: []int, inverse: bool) -> int {
+	search :: proc(m: []string, start: [2]int, find: []int) -> int {
 		hidth := len(m)
 		width := len(m[0])
 		unvisited: [dynamic][2]int
@@ -86,7 +86,7 @@ puzzle :: proc() {
 				if h1 == 'E' do h1 = 'z'
 				if h2 == 'S' do h2 = 'a'
 				if h2 == 'E' do h2 = 'z'
-				if (!inverse && h2 > h1 + 1) || (inverse && h2 < h1 - 1) do continue
+				if h2 < h1 - 1 do continue
 				s := steps[node] + 1
 				if slice.contains(unvisited[:], n) {
 					steps[n] = min(steps[n], s)
@@ -99,8 +99,8 @@ puzzle :: proc() {
 		return -1
 	}
 
-	ANSWER_1 = search(m, start, {'E'}, false)
-	ANSWER_2 = search(m, end, {'a', 'S'}, true)
+	ANSWER_1 = search(m, end, {'S'})
+	ANSWER_2 = search(m, end, {'a', 'S'})
 }
 
 /*
