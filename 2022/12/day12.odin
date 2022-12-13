@@ -47,16 +47,19 @@ puzzle :: proc() {
 	search :: proc(m: []string, start: [2]int, find: []int) -> int {
 		hidth := len(m)
 		width := len(m[0])
+
 		unvisited: [dynamic][2]int
-		visited: [dynamic][2]int
+		visited: map[[2]int]struct{}
 		steps: map[[2]int]int
 		defer {
 			delete(unvisited)
 			delete(visited)
 			delete(steps)
 		}
+
 		append(&unvisited, start)
 		steps[start] = 0
+
 		for len(unvisited) > 0 {
 			node: [2]int; {
 				index: int
@@ -64,38 +67,42 @@ puzzle :: proc() {
 				for n, i in unvisited {
 					s := steps[n]
 					if s < step {
-						node = n
 						step = s
 						index = i
 					}
 				}
+				node = unvisited[index]
 				unordered_remove(&unvisited, index)
 			}
+			defer visited[node] = {}
+
 			h1 := cast(int) m[node.y][node.x]
 			if slice.contains(find, h1) do return steps[node]
-			defer append(&visited, node)
+			if h1 == 'S' do h1 = 'a'
+			if h1 == 'E' do h1 = 'z'
+
 			neighbours := make([dynamic][2]int, 0, 4, context.temp_allocator)
 			if node.x > 0 do append(&neighbours, node - {1, 0})
 			if node.y > 0 do append(&neighbours, node - {0, 1})
 			if node.x < width - 1 do append(&neighbours, node + {1, 0})
 			if node.y < hidth - 1 do append(&neighbours, node + {0, 1})
+
 			for n in neighbours {
-				if slice.contains(visited[:], n) do continue
-				h1, h2 := cast(int) m[node.y][node.x], cast(int) m[n.y][n.x]
-				if h1 == 'S' do h1 = 'a'
-				if h1 == 'E' do h1 = 'z'
+				if n in visited do continue
+
+				h2 := cast(int) m[n.y][n.x]
 				if h2 == 'S' do h2 = 'a'
 				if h2 == 'E' do h2 = 'z'
 				if h2 < h1 - 1 do continue
+
 				s := steps[node] + 1
-				if slice.contains(unvisited[:], n) {
-					steps[n] = min(steps[n], s)
-				} else {
+				if !slice.contains(unvisited[:], n) {
 					steps[n] = s
 					append(&unvisited, n)
 				}
 			}
 		}
+
 		return -1
 	}
 
