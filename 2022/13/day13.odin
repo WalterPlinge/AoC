@@ -63,9 +63,8 @@ puzzle :: proc() {
 			return compare(left, r)
 		}
 
-		la, laok := left.(json.Array)
-		ra, raok := right.(json.Array)
-		// assert(laok && raok, "this shouldn't fail")
+		la := left.(json.Array)
+		ra := right.(json.Array)
 
 		lal, ral := len(la), len(ra)
 		length := min(lal, ral)
