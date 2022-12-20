@@ -26,6 +26,12 @@
 			"working_dir": "$file_path",
 		},
 		{
+			"name": "run (speed)",
+			"selector": "source.odin",
+			"shell_cmd": "odin run . -o:speed -disable-assert -no-bounds-check -microarch:native",
+			"working_dir": "$file_path",
+		},
+		{
 			"name": "run example",
 			"selector": "source.odin",
 			"shell_cmd": "odin run . -debug -- -example",
